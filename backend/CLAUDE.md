@@ -7,6 +7,21 @@ cd backend
 uv sync --extra dev   # Install all dependencies including test/lint tools
 ```
 
+## Running the Server
+
+```bash
+cd backend
+uv run uvicorn app.main:app --port 8000   # API + SSE on http://localhost:8000
+```
+
+- Loads the project-root `.env` (python-dotenv); real env vars win.
+- DB: `FINALLY_DB_PATH` (default `<project root>/db/finally.db`), created and seeded on startup.
+- Static frontend: `STATIC_DIR` (default `backend/static`) is mounted at `/` if it exists.
+- Layout: `app/main.py` (app + lifespan: DB init, market source, 30s snapshot task),
+  `app/api/` (routers), `app/services/` (trade/watchlist logic shared with the LLM chat),
+  `app/db/` (SQLite), `app/llm/` (chat). Request validation errors return 400 `{"detail": ...}`.
+- API tests use `tests/api/conftest.py::client` (temp DB, fixed $100 prices).
+
 ## Market Data API
 
 The market data subsystem lives in `app/market/`. Use these imports:

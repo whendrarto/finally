@@ -25,17 +25,56 @@ Single Docker container serving everything on port 8000:
 
 ## Quick Start
 
+Prerequisite: [Docker](https://www.docker.com/products/docker-desktop/) running.
+
 ```bash
-# Clone and configure
+# 1. Configure (optional: without .env the app still runs with the simulator, but AI chat needs a key)
 cp .env.example .env
-# Add your OPENROUTER_API_KEY to .env
+# edit .env and set OPENROUTER_API_KEY
 
-# Run with Docker
-docker build -t finally .
-docker run -v finally-data:/app/db -p 8000:8000 --env-file .env finally
+# 2. Start (builds the image on first run, then opens http://localhost:8000)
+./scripts/start_mac.sh            # macOS / Linux
+.\scripts\start_windows.ps1       # Windows PowerShell
 
-# Open http://localhost:8000
+# 3. Stop (your portfolio data is kept in the `finally-data` Docker volume)
+./scripts/stop_mac.sh
+.\scripts\stop_windows.ps1
 ```
+
+Start script options: `--build` / `-Build` forces an image rebuild (use after pulling changes);
+`--no-open` / `-NoOpen` skips opening the browser. Both scripts are safe to run repeatedly.
+
+If Windows blocks the script, run it once with
+`powershell -ExecutionPolicy Bypass -File .\scripts\start_windows.ps1`.
+
+### Alternatives
+
+```bash
+# Docker Compose
+docker compose up -d --build
+docker compose down               # keeps the volume; add -v to wipe data
+
+# Plain Docker
+docker build -t finally .
+docker run -d --name finally -v finally-data:/app/db -p 8000:8000 --env-file .env finally
+```
+
+To reset all data: stop the app, then `docker volume rm finally-data`.
+
+### Local development (without Docker)
+
+```bash
+# Backend (from backend/) - serves the API on :8000
+uv sync --extra dev
+uv run uvicorn app.main:app --reload --port 8000
+
+# Frontend (from frontend/) - build the static export, then let the backend serve it
+npm install
+npm run build
+rm -rf ../backend/static && cp -r out ../backend/static
+```
+
+Backend tests: `cd backend && uv run --extra dev pytest`.
 
 ## Environment Variables
 
@@ -44,6 +83,9 @@ docker run -v finally-data:/app/db -p 8000:8000 --env-file .env finally
 | `OPENROUTER_API_KEY` | Yes | OpenRouter API key for AI chat |
 | `MASSIVE_API_KEY` | No | Massive (Polygon.io) key for real market data; omit to use simulator |
 | `LLM_MOCK` | No | Set `true` for deterministic mock LLM responses (testing) |
+
+The SQLite database lives at `/app/db/finally.db` inside the container (the `finally-data` volume)
+and is created and seeded automatically on first start.
 
 ## Project Structure
 

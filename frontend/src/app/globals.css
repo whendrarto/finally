@@ -1,0 +1,159 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+
+  --color-ink: #0b101a;
+  --color-panel: #111827;
+  --color-panel-2: #162033;
+  --color-line: #233049;
+  --color-line-soft: #1a2538;
+  --color-fg: #d9e1ee;
+  --color-dim: #8592ab;
+  --color-faint: #56627a;
+
+  --color-up: #2fd08f;
+  --color-down: #ff5d6c;
+  --color-gold: #ecad0a;
+  --color-azure: #209dd7;
+  --color-plum: #753991;
+  --color-plum-hi: #8e48b0;
+}
+
+html,
+body {
+  height: 100%;
+  background: var(--color-ink);
+  color: var(--color-fg);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.35;
+  -webkit-font-smoothing: antialiased;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Panels: hairline frame with a gold tick on the corner that marks the panel's anchor */
+.panel {
+  position: relative;
+  background: var(--color-panel);
+  border: 1px solid var(--color-line);
+  min-height: 0;
+  min-width: 0;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--color-line-soft);
+  color: var(--color-dim);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.panel-head h2 {
+  color: var(--color-fg);
+  font-weight: 600;
+  font-size: 12.5px;
+}
+
+/* Price flash: instant highlight, fades out over ~500ms */
+@keyframes flash-up {
+  from {
+    background-color: rgb(47 208 143 / 0.38);
+  }
+  to {
+    background-color: rgb(47 208 143 / 0);
+  }
+}
+@keyframes flash-down {
+  from {
+    background-color: rgb(255 93 108 / 0.38);
+  }
+  to {
+    background-color: rgb(255 93 108 / 0);
+  }
+}
+.flash-up {
+  animation: flash-up 600ms ease-out;
+}
+.flash-down {
+  animation: flash-down 600ms ease-out;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.dot-pulse {
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+@keyframes think {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  40% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+.think span {
+  display: inline-block;
+  animation: think 1s ease-in-out infinite;
+}
+.think span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.think span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flash-up,
+  .flash-down,
+  .dot-pulse,
+  .think span {
+    animation-duration: 1ms;
+    animation-iteration-count: 1;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 1px;
+}
+
+input::placeholder {
+  color: var(--color-faint);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
